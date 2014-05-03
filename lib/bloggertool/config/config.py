@@ -127,18 +127,18 @@ class Config(object):
         del self._posts[name]
         self.need_save = True
 
-    def post_by_path(self, rstpath, no_existance_check=False):
-        if rstpath.endswith('.'):
-            rstpath = rstpath[:-1]
+    def post_by_path(self, mdpath, no_existance_check=False):
+        if mdpath.endswith('.'):
+            mdpath = mdpath[:-1]
 
-        if not rstpath.endswith('.rst'):
-            rstpath += '.rst'
+        if not mdpath.endswith('.md'):
+            mdpath += '.md'
 
-        rstpath = self.fs.expand_path(rstpath)
+        mdpath = self.fs.expand_path(mdpath)
 
-        relpath = self.fs.rel_path(rstpath,
+        relpath = self.fs.rel_path(mdpath,
                                    no_existance_check=no_existance_check)
-        name = self.fs.replace_ext(relpath, '')  # drop .rst ending
+        name = self.fs.replace_ext(relpath, '')  # drop .md ending
 
         if name in self:
             return self[name]

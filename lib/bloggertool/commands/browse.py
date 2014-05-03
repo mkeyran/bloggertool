@@ -25,7 +25,7 @@ class OpenCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('file', help="rst file to link with")
+        parser.add_argument('file', help="md file to link with")
         parser.add_argument('--always', default=False, action='store_true',
                             help="Always regenerate html files")
         parser.add_argument('--serve', default=False, action='store_true',
@@ -43,7 +43,7 @@ class OpenCommand(BaseCommand):
         config = self.config
         post = config.post_by_path(self.file)
         if not post:
-            self.log.error("RST file '%s' is not registered", self.file)
+            self.log.error("MD file '%s' is not registered", self.file)
             return
 
         if config.interactive is None and self.serve:
@@ -74,7 +74,7 @@ class ROpenCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('file', help="rst file to link with")
+        parser.add_argument('file', help="md file to link with")
 
     def __init__(self, args):
         self.file = args.file
@@ -83,7 +83,7 @@ class ROpenCommand(BaseCommand):
         config = self.config
         post = config.post_by_path(self.file)
         if not post:
-            self.log.error("RST file '%s' is not registered", self.file)
+            self.log.error("MD file '%s' is not registered", self.file)
             return
 
         self.log.info("Opening '%s'", post.link)

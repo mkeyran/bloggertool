@@ -124,28 +124,28 @@ def run():
 
     print "add post"
     with exe.cd('sample_blog'):
-        exe.write('article.rst', TXT)
-        rst_fname = exe.full_name('article.rst')
-        out = exe.go('add article.rst')
-    ADD(name='article', file='article.rst') == out
+        exe.write('article.md', TXT)
+        md_fname = exe.full_name('article.md')
+        out = exe.go('add article.md')
+    ADD(name='article', file='article.md') == out
 
     print "generate html without template"
     with exe.cd('sample_blog'):
-        out = exe.go('html article.rst')
+        out = exe.go('html article.md')
         Q(INNER_HTML) == exe.read('article.inner.html')
-    HTML_WARNING_NO_TEMPLATE(name='article', file=rst_fname) == out
+    HTML_WARNING_NO_TEMPLATE(name='article', file=md_fname) == out
 
     print "generate fresh html without template"
     with exe.cd('sample_blog'):
-        out = exe.go('html article.rst')
+        out = exe.go('html article.md')
         Q(INNER_HTML) == exe.read('article.inner.html')
     SKIP_FRESH(name='article') == out
 
     print "generate fresh html with --always parameter without template"
     with exe.cd('sample_blog'):
-        out = exe.go('html article.rst --always')
+        out = exe.go('html article.md --always')
         Q(INNER_HTML) == exe.read('article.inner.html')
-    HTML_WARNING_NO_TEMPLATE(name='article', file=rst_fname) == out
+    HTML_WARNING_NO_TEMPLATE(name='article', file=md_fname) == out
 
     ###########################################
     print "******* TEMPLATED HTML *******"
@@ -188,7 +188,7 @@ def run():
     print ("generate html with template without title and slug, "
            "slug derived from name")
     with exe.cd('sample_blog'):
-        out = exe.go('html article.rst --always')
+        out = exe.go('html article.md --always')
         inner = exe.read('article.inner.html')
         INNER_HTML == inner
         TEMPLATE.render(title='', inner=inner,
@@ -210,9 +210,9 @@ def run():
     print "add second post in subfolder"
     exe.mkdir('sample_blog/sub')
     with exe.cd('sample_blog/sub'):
-        exe.write('second.rst', TXT2)
-        out = exe.go('add second.rst --show-traceback')
-    ADD(name='sub/second', file='sub/second.rst') == out
+        exe.write('second.md', TXT2)
+        out = exe.go('add second.md --show-traceback')
+    ADD(name='sub/second', file='sub/second.md') == out
 
     print "generate html with template with full metadata"
     with exe.cd('sample_blog/sub'):
@@ -230,27 +230,27 @@ def run():
     LABEL = Q('INFO Labels for post {name!q}: {labels}')
     LABEL_UPDATE = Q('INFO Updated labels for post {name!q}: {labels}')
 
-    print "show empty labels for article.rst"
+    print "show empty labels for article.md"
     with exe.cd('sample_blog'):
         out = exe.go('label article')
     LABEL(name='article', labels=None) == out
 
-    print "show empty labels for article.rst from sub folder"
+    print "show empty labels for article.md from sub folder"
     with exe.cd('sample_blog/sub'):
         out = exe.go('label ../article')
     LABEL(name='article', labels=None) == out
 
-    print "show labels for sub/second.rst"
+    print "show labels for sub/second.md"
     with exe.cd('sample_blog'):
         out = exe.go('label sub/second')
     LABEL(name='sub/second', labels='other, sample') == out
 
-    print "show labels for sub/second.rst from sub folder"
+    print "show labels for sub/second.md from sub folder"
     with exe.cd('sample_blog/sub'):
         out = exe.go('label second')
     LABEL(name='sub/second', labels='other, sample') == out
 
-    print "add label for article.rst"
+    print "add label for article.md"
     with exe.cd('sample_blog'):
         out = exe.go('label article --add "a, b"')
     LABEL_UPDATE(name='article', labels='a, b') == out
@@ -260,7 +260,7 @@ def run():
         out = exe.go('label article')
     LABEL(name='article', labels='a, b') == out
 
-    print "remove label from article.rst"
+    print "remove label from article.md"
     with exe.cd('sample_blog'):
         out = exe.go('label article --rm "a"')
     LABEL_UPDATE(name='article', labels='b') == out
@@ -270,7 +270,7 @@ def run():
         out = exe.go('label article')
     LABEL(name='article', labels='b') == out
 
-    print "set label for article.rst"
+    print "set label for article.md"
     with exe.cd('sample_blog'):
         out = exe.go('label article --set a')
     LABEL_UPDATE(name='article', labels='a') == out
@@ -483,8 +483,8 @@ def run():
 
     print 'add removed files'
     with exe.cd('sample_blog/sub'):
-        exe.go('add ../article.rst')
-        exe.go('add second.rst')
+        exe.go('add ../article.md')
+        exe.go('add second.md')
 
     print 'link article'
     with exe.cd('sample_blog/sub'):
@@ -551,7 +551,7 @@ def run():
 
     print "modify and diff"
     with exe.cd('sample_blog/sub'):
-        exe.write('second.rst', TXT3)
+        exe.write('second.md', TXT3)
         out = exe.go('diff second --force')
     DIFF(link=link2 + ' ', inner='sub/second.inner.html ') == out
 

@@ -17,14 +17,14 @@ from .basecommand import BaseCommand
 
 class LinkCommand(BaseCommand):
     NAME = 'link'
-    HELP = "Link rst with (already existing) blogspot post."
+    HELP = "Link md with (already existing) blogspot post."
     DESCR = dedent("""\
-    Link rst with (already existing) blogspot post.
+    Link md with (already existing) blogspot post.
     """)
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('file', help="rst file to link with")
+        parser.add_argument('file', help="md file to link with")
         parser.add_argument('url', help="blogspot url")
 
     def __init__(self, args):
@@ -35,7 +35,7 @@ class LinkCommand(BaseCommand):
         config = self.config
         post = config.post_by_path(self.file)
         if not post:
-            self.log.error("RST file %s is not registered", qname(self.file))
+            self.log.error("MD file %s is not registered", qname(self.file))
             return
 
         if post.postid:

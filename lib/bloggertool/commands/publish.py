@@ -23,7 +23,7 @@ class PublishCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('file', help="rst file to publish")
+        parser.add_argument('file', help="md file to publish")
         parser.add_argument('--always', default=False, action='store_true',
                             help="Always regenerate html files")
 
@@ -35,7 +35,7 @@ class PublishCommand(BaseCommand):
         config = self.config
         post = config.post_by_path(self.file)
         if not post:
-            self.log.error("RST file %s is not registered", qname(self.file))
+            self.log.error("MD file %s is not registered", qname(self.file))
             return
 
         if post.postid:

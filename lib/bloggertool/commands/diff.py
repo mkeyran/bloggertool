@@ -21,7 +21,7 @@ class DiffCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('file', help=T("rst file to link with"))
+        parser.add_argument('file', help=T("md file to link with"))
 
     def __init__(self, args):
         self.file = args.file
@@ -30,12 +30,12 @@ class DiffCommand(BaseCommand):
         config = self.config
         post = config.post_by_path(self.file)
         if not post:
-            self.log.error(T("RST file {0!q} is not registered").format(
+            self.log.error(T("MD file {0!q} is not registered").format(
                 self.file))
             return
 
         if not post.postid:
-            self.log.error(a("RST file {self.file!q} has "
+            self.log.error(a("MD file {self.file!q} has "
                              "not pushed on server yet"))
             return
 

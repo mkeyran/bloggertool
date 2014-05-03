@@ -86,7 +86,7 @@ class TestFileSystem(unittest.TestCase):
             self.assertEqual('Русский текст 2', content)
 
     def test_replace_text(self):
-        self.assertEqual('file.html', self.fs.replace_ext('file.rst', '.html'))
+        self.assertEqual('file.html', self.fs.replace_ext('file.md', '.html'))
 
     def test_check_existance(self):
         fname = os.path.join(self.tmpdir, 'filename')

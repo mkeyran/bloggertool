@@ -13,9 +13,9 @@ from bloggertool.str_util import qname
 
 class AddCommand(BaseCommand):
     NAME = 'add'
-    HELP = "Add rst file"
+    HELP = "Add md file"
     DESCR = dedent("""\
-    Add rst file to project
+    Add md file to project
     """)
 
     @classmethod
@@ -39,8 +39,8 @@ class AddCommand(BaseCommand):
             abs_path = config.fs.expand_path(fname)
             rel_path = config.fs.rel_path(abs_path)
 
-            if not rel_path.endswith('.rst'):
-                self.log.error("Cannot operate with non-rst files")
+            if not rel_path.endswith('.md'):
+                self.log.error("Cannot operate with non-md files")
                 continue
 
             name = config.fs.replace_ext(rel_path, '')

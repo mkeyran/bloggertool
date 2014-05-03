@@ -20,7 +20,7 @@ class PushCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('file', help="rst file to link with")
+        parser.add_argument('file', help="md file to link with")
         parser.add_argument('--always', default=False, action='store_true',
                             help="Always regenerate html files")
 
@@ -32,11 +32,11 @@ class PushCommand(BaseCommand):
         config = self.config
         post = config.post_by_path(self.file)
         if not post:
-            self.log.error("RST file '%s' is not registered", self.file)
+            self.log.error("MD file '%s' is not registered", self.file)
             return
 
         if not post.postid:
-            self.log.error("RST file '%s' has not pushed on server yet",
+            self.log.error("MD file '%s' has not pushed on server yet",
                            self.file)
             return
 

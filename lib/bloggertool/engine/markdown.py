@@ -19,11 +19,11 @@ class Engine(object):
                      # default at end of html or ///Footnotes Go Here ///
                      'footnotes',
                      # configure via header_level and header_forceid: Off
-                     # in rst metadata
+                     # in md metadata
                      'headerid',
                      'meta',
                      'tables',
-                     'toc',  # use [TOC] in rst file
+                     'toc',  # use [TOC] in md file
                      ]
 
 

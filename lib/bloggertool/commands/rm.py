@@ -15,7 +15,7 @@ from .basecommand import BaseCommand
 
 class RmCommand(BaseCommand):
     NAME = 'rm'
-    HELP = "Remove rst file from blogspot project database."
+    HELP = "Remove md file from blogspot project database."
     DESCR = dedent("""\
     Doesn't remove file itself.
     Doesn't remove post from blogspot site.

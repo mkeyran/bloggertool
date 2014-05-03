@@ -29,7 +29,7 @@ class SampleIO(StringIO):
 class TestPost(unittest.TestCase):
     def setUp(self):
         self.config = Config(os.path.abspath('project-root'))
-        self.post = Post(self.config, 'name', 'dir/file.rst')
+        self.post = Post(self.config, 'name', 'dir/file.md')
         self.mocker = mocker.Mocker()
         self.log = self.mocker.mock()
         self.post.log = self.log
@@ -40,7 +40,7 @@ class TestPost(unittest.TestCase):
 
     def test_ctor(self):
         self.assertEqual('name', self.post.name)
-        self.assertEqual('dir/file.rst', self.post.file)
+        self.assertEqual('dir/file.md', self.post.file)
         self.assertEqual('name', self.post.slug)
 
     def test_inner_html_path(self):
@@ -52,13 +52,11 @@ class TestPost(unittest.TestCase):
             self.assertEqual('dir/file.html', self.post.nice_html_path)
 
     def test_is_html_fresh_inner_not_found(self):
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
 
-        #self.post.config.fs._impl.exists(full_rstpath)
-        #self.mocker.result(True)
         self.post.config.fs._impl.exists(full_inner_html_path)
         self.mocker.result(False)
 
@@ -66,13 +64,11 @@ class TestPost(unittest.TestCase):
             self.assertFalse(self.post.is_html_fresh)
 
     def test_is_html_fresh_nice_not_found(self):
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
 
-        #self.post.config.fs._impl.exists(full_rstpath)
-        #self.mocker.result(True)
         self.post.config.fs._impl.exists(full_inner_html_path)
         self.mocker.result(True)
         self.post.config.fs._impl.exists(full_nice_html_path)
@@ -82,12 +78,12 @@ class TestPost(unittest.TestCase):
             self.assertFalse(self.post.is_html_fresh)
 
     def test_is_html_fresh_is_ok(self):
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
 
-        self.post.config.fs._impl.exists(full_rstpath)
+        self.post.config.fs._impl.exists(full_mdpath)
         self.mocker.result(True)
         self.post.config.fs._impl.exists(full_inner_html_path)
         self.mocker.result(True)
@@ -95,7 +91,7 @@ class TestPost(unittest.TestCase):
         self.post.config.fs._impl.exists(full_nice_html_path)
         self.mocker.result(True)
         self.mocker.count(2)
-        self.post.config.fs._impl.getmtime(full_rstpath)
+        self.post.config.fs._impl.getmtime(full_mdpath)
         self.mocker.result(5)
         self.post.config.fs._impl.getmtime(full_inner_html_path)
         self.mocker.result(10)
@@ -106,12 +102,12 @@ class TestPost(unittest.TestCase):
             self.assertTrue(self.post.is_html_fresh)
 
     def test_is_html_fresh_is_inner_expired(self):
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
 
-        self.post.config.fs._impl.exists(full_rstpath)
+        self.post.config.fs._impl.exists(full_mdpath)
         self.mocker.result(True)
         self.post.config.fs._impl.exists(full_inner_html_path)
         self.mocker.result(True)
@@ -119,7 +115,7 @@ class TestPost(unittest.TestCase):
         self.post.config.fs._impl.exists(full_nice_html_path)
         self.mocker.result(True)
         self.mocker.count(2)
-        self.post.config.fs._impl.getmtime(full_rstpath)
+        self.post.config.fs._impl.getmtime(full_mdpath)
         self.mocker.result(5)
         self.post.config.fs._impl.getmtime(full_inner_html_path)
         self.mocker.result(1)
@@ -130,12 +126,12 @@ class TestPost(unittest.TestCase):
             self.assertFalse(self.post.is_html_fresh)
 
     def test_is_html_fresh_is_nice_expired(self):
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
 
-        self.post.config.fs._impl.exists(full_rstpath)
+        self.post.config.fs._impl.exists(full_mdpath)
         self.mocker.result(True)
         self.post.config.fs._impl.exists(full_inner_html_path)
         self.mocker.result(True)
@@ -143,7 +139,7 @@ class TestPost(unittest.TestCase):
         self.post.config.fs._impl.exists(full_nice_html_path)
         self.mocker.result(True)
         self.mocker.count(2)
-        self.post.config.fs._impl.getmtime(full_rstpath)
+        self.post.config.fs._impl.getmtime(full_mdpath)
         self.mocker.result(5)
         self.post.config.fs._impl.getmtime(full_inner_html_path)
         self.mocker.result(6)
@@ -162,18 +158,18 @@ class TestPost(unittest.TestCase):
 
     def test_refresh_html_cannot_change_published_slug(self):
         self.config.interactive = False
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
 
         self.post.postid = 'some postid'
 
-        self.post.config.fs._impl.exists(full_rstpath)
+        self.post.config.fs._impl.exists(full_mdpath)
         self.mocker.result(True)
         self.mocker.count(1, None)
 
-        self.config.fs._impl.open(full_rstpath, 'r', 'utf-8')
+        self.config.fs._impl.open(full_mdpath, 'r', 'utf-8')
         self.mocker.result(StringIO(dedent(u"""\
             Title: Заголовок
             slug: article-slug
@@ -189,7 +185,7 @@ class TestPost(unittest.TestCase):
 
     def test_refresh_html_with_template(self):
         self.config.interactive = None
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
@@ -201,11 +197,11 @@ class TestPost(unittest.TestCase):
         self.mocker.result('y')
         self.mocker.count(3)
 
-        self.post.config.fs._impl.exists(full_rstpath)
+        self.post.config.fs._impl.exists(full_mdpath)
         self.mocker.result(True)
         self.mocker.count(1, None)
 
-        self.config.fs._impl.open(full_rstpath, 'r', 'utf-8')
+        self.config.fs._impl.open(full_mdpath, 'r', 'utf-8')
         self.mocker.result(StringIO(dedent(u"""\
             Title: Заголовок
             slug: article-slug
@@ -266,7 +262,7 @@ class TestPost(unittest.TestCase):
 
     def test_refresh_html_without_template(self):
         self.config.interactive = None
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
@@ -278,11 +274,11 @@ class TestPost(unittest.TestCase):
         self.mocker.result('y')
         self.mocker.count(3)
 
-        self.post.config.fs._impl.exists(full_rstpath)
+        self.post.config.fs._impl.exists(full_mdpath)
         self.mocker.result(True)
         self.mocker.count(1, None)
 
-        self.config.fs._impl.open(full_rstpath, 'r', 'utf-8')
+        self.config.fs._impl.open(full_mdpath, 'r', 'utf-8')
         self.mocker.result(StringIO(dedent(u"""\
             Title: Заголовок
             slug: article-slug
@@ -313,7 +309,7 @@ class TestPost(unittest.TestCase):
             self.assertEqual(u'<p>Текст статьи</p>', nice_body.val)
 
     def test_inner_html(self):
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')
@@ -334,7 +330,7 @@ class TestPost(unittest.TestCase):
                              self.post.inner_html())
 
     def test_nice_html(self):
-        full_rstpath = os.path.join(self.fs.root, 'dir/file.rst')
+        full_mdpath = os.path.join(self.fs.root, 'dir/file.md')
         full_inner_html_path = os.path.join(self.fs.root,
                                             'dir/file.inner.html')
         full_nice_html_path = os.path.join(self.fs.root, 'dir/file.html')

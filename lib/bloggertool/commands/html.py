@@ -13,9 +13,9 @@ from .basecommand import BaseCommand
 
 class HtmlCommand(BaseCommand):
     NAME = 'html'
-    HELP = T("Generate html output for rst files.")
+    HELP = T("Generate html output for md files.")
     DESCR = T("""
-    Without arguments updates only htmls older then source rst
+    Without arguments updates only htmls older then source md
     for all registered posts.
     """)
 
@@ -24,7 +24,7 @@ class HtmlCommand(BaseCommand):
     @classmethod
     def fill_parser(cls, parser):
         parser.add_argument('file', nargs='?',
-                            help="rst file to generate html")
+                            help="md file to generate html")
         parser.add_argument('--always', default=False, action='store_true',
                             help=T("Always regenerate html files"))
         parser.add_argument('--serve', default=False, action='store_true',

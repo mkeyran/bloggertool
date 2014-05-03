@@ -26,7 +26,7 @@ class LabelCommand(BaseCommand):
     @classmethod
     def fill_parser(cls, parser):
         parser.add_argument('files', nargs='*',
-                            help="rst file to operate with labels")
+                            help="md file to operate with labels")
         labels = parser.add_mutually_exclusive_group()
         labels.add_argument('-a', '--add', help="add labels")
         labels.add_argument('-s', '--set', help="set labels")
@@ -43,7 +43,7 @@ class LabelCommand(BaseCommand):
         for fname in self.files:
             post = config.post_by_path(fname)
             if not post:
-                self.log.error(a("RST file {fname!q) is not registered"))
+                self.log.error(a("MD file {fname!q) is not registered"))
                 continue
             if self.add:
                 self.do_add(post)

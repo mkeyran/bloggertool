@@ -81,12 +81,12 @@ class Post(Record):
             return False
         if not fs.exists(self.nice_html_path):
             return False
-        rst_time = fs.getmtime(self.file)
+        md_time = fs.getmtime(self.file)
         inner_html_time = fs.getmtime(self.inner_html_path)
         nice_html_time = fs.getmtime(self.nice_html_path)
-        if rst_time > inner_html_time:
+        if md_time > inner_html_time:
             return False
-        if rst_time > nice_html_time:
+        if md_time > nice_html_time:
             return False
         return True
 
@@ -101,8 +101,8 @@ class Post(Record):
 
         engine = get_engine(self.doctype)
 
-        with fs.open(self.file, 'r', self.effective_encoding) as rst:
-            source = rst.read()
+        with fs.open(self.file, 'r', self.effective_encoding) as md:
+            source = md.read()
             if not source:
                 self.log.warning("Empty source file: '%s'", self.file)
                 return False

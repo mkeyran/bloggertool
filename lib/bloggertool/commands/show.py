@@ -23,7 +23,7 @@ class ShowCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('file', help="rst file")
+        parser.add_argument('file', help="md file")
         parser.add_argument('--slug',
                             help="set slug (used for generated post link "
                             "in post publishing")
@@ -39,7 +39,7 @@ class ShowCommand(BaseCommand):
         config = self.config
         post = config.post_by_path(self.file)
         if not post:
-            self.log.error(a("RST file {self.file!q} is not registered"))
+            self.log.error(a("MD file {self.file!q} is not registered"))
             return
 
         if not self.slug and not self.title:
