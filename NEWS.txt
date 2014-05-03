@@ -1,0 +1,9 @@
+* implement https://bugs.launchpad.net/bloggertool/+bug/718135,
+    supported markdown extensions are: abbr, codehilite, def_list, fenced_code,
+    footnotes, headerid, meta, tables, toc.
+
+* implement nice html output with jinga template support.
+
+* implement 'label' command.
+
+* change output for 'ls' and 'rls' commands to support short and long versions.
