@@ -74,7 +74,7 @@ setup(
     version=get_version('lib/bloggertool/__version__.py'),
     author='Andrew Svetlov',
     author_email='andrew.svetlov@gmail.com',
-    url='https://launchpad.net/bloggertool/',
+    url='https://github.com/asvetlov/bloggertool',
     description=read_short_descr('README.txt'),
     long_description=read_long_descr('README.txt'),
     license='MIT',
