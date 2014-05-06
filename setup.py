@@ -4,6 +4,9 @@ import os
 
 from setuptools import setup, find_packages
 
+requires = ['python-dateutil', 'trafaret', 'keyring', 'jinja2', 'gdata',
+            'markdown', 'PyYAML', 'pyinotify']
+
 
 def get_version(fname):
     with open(fname, 'r') as f:
@@ -93,7 +96,7 @@ setup(
             ['blog = bloggertool.main:main']
         },
     zip_safe=True,
-    #requires=
+    install_requires=requires,
     #test_require
     test_suite='nose.collector',
     #require

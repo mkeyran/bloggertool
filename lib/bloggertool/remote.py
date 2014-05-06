@@ -8,10 +8,9 @@
 from copy import deepcopy
 
 from dateutil.parser import parse as dtparse
-from dateutil.tz import tzutc, tzlocal
+from dateutil.tz import tzutc
 
 from gdata.blogger.client import BloggerClient as _BloggerClient
-#from gdata.blogger.data import LABEL_SCHEME
 from gdata.client import CaptchaChallenge, BadAuthentication
 from gdata.blogger.data import BlogPost as _BlogPost
 
