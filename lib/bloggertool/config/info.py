@@ -67,9 +67,10 @@ class Info(Record):
             self._template_env.filters['abspath'] = self.abspath_filter
         return self._template_env.get_template(self.template_file)
 
-    def remote(self):
+    def remote(self, reset_credentials=False):
         try:
-            srv = Remote(self.blogid,
+            srv = Remote(reset_credentials,
+                         self.blogid,
                          secret_filename=self.config.secret_filename)
             return srv
         except RemoteError as ex:

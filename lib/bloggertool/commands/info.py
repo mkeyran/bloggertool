@@ -30,7 +30,7 @@ class InfoCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('--blogid', help="set blog id")
+        parser.add_argument('--blogid', help="set blog id and blog url")
         # templates
         exclusive = parser.add_mutually_exclusive_group()
         exclusive.add_argument('--template',
@@ -69,6 +69,7 @@ class InfoCommand(BaseCommand):
             out = T("""
                 User info:
                     blogid: {info.blogid!N}
+                    url: {info.blogurl!N}
                     template:
                         dir: {info.template_dir!N}
                         file: {info.template_file!N}

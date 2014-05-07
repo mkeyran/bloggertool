@@ -20,21 +20,23 @@ class RInfoCommand(BaseCommand):
 
     @classmethod
     def fill_parser(cls, parser):
-        pass
+        parser.add_argument('--reset_credentials', default=False,
+                            action='store_true',
+                            help="reset stored credentials")
 
     def __init__(self, args):
-        pass
+        self.reset_credentials = args.reset_credentials
 
     def run(self):
         config = self.config
 
         info = config.info
 
-        srv = info.remote()
+        srv = info.remote(self.reset_credentials)
 
         blogs = srv.get_blogs()
         out = []
         for blog in blogs:
-            out.append("    [%s] %s" % (blog.blogid, blog.title))
+            out.append("    [%s->%s] %s" % (blog.blogid, blog.url, blog.title))
         self.log.info("Blogs of user '%s'\n%s", blogs.title,
                       '\n'.join(out))

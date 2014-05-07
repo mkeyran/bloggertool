@@ -59,6 +59,11 @@ class Config(object):
                 if not os.path.exists(config_path):
                     raise RootNotFoundError("Cannot find project for '%s'" %
                                             os.getcwd())
+        secret_path = os.path.join(root, cls.SECRET_FILENAME)
+        if not os.path.exists(secret_path):
+            raise RootNotFoundError(
+                "Cannot find secret file '%s' beside to config file '%s'"
+                % (secret_path, config_path))
         return root
 
     @classmethod

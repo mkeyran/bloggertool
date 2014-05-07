@@ -48,14 +48,9 @@ class PublishCommand(BaseCommand):
         srv = config.info.remote()
 
         content = post.inner_html()
-        if not post.slug:
-            rpost = srv.add_post(post.title, content,
-                                 labels=post.labels)
-        else:
-            rpost = srv.add_post(post.slug, content,
-                                 labels=post.labels)
-            updated_rpost = rpost.set_title(post.title)
-            updated_rpost = srv.update_post(updated_rpost)
+        rpost = srv.add_post(post.title, content,
+                             slug=post.slug,
+                             labels=post.labels)
 
         post.postid = rpost.postid
         post.link = rpost.link

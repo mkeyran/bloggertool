@@ -22,16 +22,20 @@ class RLsCommand(BaseCommand):
     def fill_parser(cls, parser):
         parser.add_argument('-l', '--long', default=False, action='store_true',
                             help="long output format")
+        parser.add_argument('--reset_credentials', default=False,
+                            action='store_true',
+                            help="reset stored credentials")
 
     def __init__(self, args):
         self.long = args.long
+        self.reset_credentials = args.reset_credentials
 
     def run(self):
         config = self.config
 
         info = config.info
 
-        srv = info.remote()
+        srv = info.remote(self.reset_credentials)
 
         rposts = srv.get_posts()
         out = []
@@ -50,5 +54,5 @@ class RLsCommand(BaseCommand):
                     """)
             out.append(ret)
 
-        self.log.info("Remote posts for blog '%s':\n----------\n%s",
+        self.log.info("Remote posts for blog '%s':\n----------\n%s\n",
                       rposts.title, '\n'.join(out))

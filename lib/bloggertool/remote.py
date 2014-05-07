@@ -12,27 +12,19 @@ from copy import deepcopy
 from dateutil.parser import parse as dtparse
 from dateutil.tz import tzutc
 
-#from gdata.blogger.client import BloggerClient as _BloggerClient
-#from gdata.client import CaptchaChallenge, BadAuthentication
-#from gdata.blogger.data import BlogPost as _BlogPost
-
 from googleapiclient import discovery
 from oauth2client import client
 from oauth2client import keyring_storage
 from oauth2client import tools
 import httplib2
-from googleapiclient import discovery
+import transliterate
 
-from bloggertool.__version__ import __version__
 from bloggertool.exceptions import RemoteError
 
 
 class Remote(object):
-    URL = 'https://www.googleapis.com/blogger/v3/'
-    POST_URL = 'http://www.blogger.com/feeds/%s/posts/default/%s'
-    SOURCE = 'AndrewSvetlov-BloggerTool-%s' % __version__
 
-    def __init__(self, blogid, secret_filename):
+    def __init__(self, reset_credentials, blogid, secret_filename):
         self._blogid = blogid
         flow = client.flow_from_clientsecrets(
             secret_filename,
@@ -41,12 +33,16 @@ class Remote(object):
 
         user = getpass.getuser()
         storage = keyring_storage.Storage('blogspot-tool-storage', user)
-        credentials = storage.get()
+        if not reset_credentials:
+            credentials = storage.get()
+        else:
+            credentials = None
+
         http = httplib2.Http()
         if credentials is None or credentials.invalid:
             flow.redirect_uri = client.OOB_CALLBACK_URN
             authorize_url = flow.step1_get_authorize_url()
-            print('Go to', authorize_url)
+            print('Please open', authorize_url)
             code = raw_input('Enter verification code: ').strip()
 
             try:
@@ -68,155 +64,168 @@ class Remote(object):
         feed = self._client.blogs().listByUser(userId="self").execute()
         return Blogs(feed)
 
+    def get_blog(self, blogid):
+        feed = self._client.blogs().get(blogId=self._blogid).execute()
+        return Blog(feed)
+
     def check_blogid(self):
         if not self._blogid:
             raise RemoteError("Set info blogid first")
 
     def get_posts(self):
         self.check_blogid()
-        return Posts(self._client.get_posts(self._blogid))
+        req = self._client.posts().list(blogId=self._blogid,
+                                        status=['live', 'draft', 'scheduled'])
+        ret = []
+        while req is not None:
+            rep = req.execute()
+            ret.extend(rep.get('items', []))
+            req = self._client.posts().list_next(req, rep)
+        return Posts(ret)
 
     def get_post(self, postid):
         self.check_blogid()
-        url = self.POST_URL % (self._blogid, postid)
-        entry = self._client.get_feed(url, desired_class=_BlogPost)
-        return Post(entry)
+        req = self._client.posts().get(blogId=self._blogid, postId=postid)
+        rep = req.execute()
+        return Post(rep)
 
     def update_post(self, post):
-        self._client.update(post._entry)
-        return self.get_post(post.postid)
-
-    def add_post(self, title, content, labels=None):
         self.check_blogid()
-        post = Post(self._client.add_post(self._blogid,
-                                          title, content, labels))
-        return self.get_post(post.postid)
+        req = self._client.posts().update(blogId=self._blogid,
+                                          postId=post.postid,
+                                          body=post._item)
+        rep = req.execute()
+        return Post(rep)
+
+    def add_post(self, title, content, slug=None, labels=None):
+        self.check_blogid()
+        if slug is None:
+            slug = transliterate.slugify(title)
+        req = self._client.posts().insert(
+            blogId=self._blogid,
+            body={
+                "title": slug,
+                "content": content,
+                "labels": labels if labels else []}
+            )
+        rep = req.execute()
+        if slug != title:
+            req = self._client.posts().patch(blogId=self._blogid,
+                                             postId=rep['id'],
+                                             body={"title": title})
+            rep = req.execute()
+        return Post(rep)
 
 
 class Blogs(object):
-    def __init__(self, feed):
-        self._feed = feed
+    def __init__(self, items):
+        self._items = items
 
     @property
     def title(self):
-        return self._feed.title.text
+        return "Blogs"
 
     def __len__(self):
-        return len(self._feed.entry)
+        return len(self._items['items'])
 
     def __iter__(self):
-        return (Blog(entry) for entry in self._feed.entry)
+        return (Blog(item) for item in self._items['items'])
 
     def __getitem__(self, index):
-        return Blog(self._feed.entry[index])
+        assert isinstance(index, int)
+        return Blog(self._items['items'][index])
 
 
 class Blog(object):
-    def __init__(self, entry):
-        self._entry = entry
+    def __init__(self, item):
+        self._item = item
 
     @property
     def blogid(self):
-        return self._entry.get_blog_id()
+        return self._item['id']
 
     @property
     def title(self):
-        return self._entry.title.text
+        return self._item['name']
+
+    @property
+    def url(self):
+        return self._item['url']
 
 
 class Posts(object):
-    def __init__(self, feed):
-        self._feed = feed
+    def __init__(self, items):
+        self._items = items
 
     @property
     def title(self):
-        return self._feed.title.text
+        return "Posts"
 
     def __len__(self):
-        return len(self._feed.entry)
+        return len(self._items)
 
     def __iter__(self):
-        return (Post(entry) for entry in self._feed.entry)
+        return (Post(item) for item in self._items)
 
     def __getitem__(self, index):
-        return Post(self._feed.entry[index])
+        assert isinstance(index, int)
+        return Post(self._items[index])
 
 
 class Post(object):
-    def __init__(self, entry):
-        self._entry = entry
+    def __init__(self, item):
+        self._item = item
 
     @property
     def title(self):
-        return self._entry.title.text
+        return self._item['title']
 
     def set_title(self, title):
-        new_entry = deepcopy(self._entry)
-        new_entry.title.text = title
-        return Post(new_entry)
+        new_item = deepcopy(self._item)
+        new_item['title'] = title
+        return Post(new_item)
 
     @property
     def postid(self):
-        return self._entry.get_post_id()
+        return self._item['id']
 
     @property
     def blogid(self):
-        return self._entry.get_blog_id()
-
-    @property
-    def entryid(self):
-        return self._entry.id.text
+        return self._item['blog']['id']
 
     @property
     def draft(self):
-        ret = False
-        if self._entry.control:
-            draft = getattr(self._entry.control, 'draft', None)
-            if draft is not None:
-                ret = draft.text == 'yes'
-        return ret
+        return self._item.get('status', 'live').lower() != 'live'
 
     @property
     def published(self):
-        return dtparse(self._entry.published.text).astimezone(tzutc())
+        return dtparse(self._item['published']).astimezone(tzutc())
 
     @property
     def updated(self):
-        return dtparse(self._entry.updated.text).astimezone(tzutc())
+        return dtparse(self._item['updated']).astimezone(tzutc())
 
     @property
     def content(self):
-        return self._entry.content.text
+        return self._item['content']
 
     def set_content(self, html):
-        new_entry = deepcopy(self._entry)
-        new_entry.content.text = html
-        return Post(new_entry)
+        new_item = deepcopy(self._item)
+        new_item['content'] = html
+        return Post(new_item)
 
     @property
     def link(self):
-        for link in self._entry.link:
-            if link.rel == 'alternate':
-                return link.href
-        return None
-
-    #def set_link(self, link):
-    #    new_entry = deepcopy(self._entry)
-    #    for link in new_entry.link:
-    #        if link.rel == 'alternate':
-    #            link.href = link
-    #    return Post(new_entry)
+        return self._item['url']
 
     @property
     def labels(self):
-        return set(c.term for c in self._entry.category)
+        return set(self._item['labels'])
 
     def set_labels(self, labels):
-        new_entry = deepcopy(self._entry)
-        del new_entry.category[:]
-        for label in labels:
-            new_entry.add_label(label)
-        return Post(new_entry)
+        new_item = deepcopy(self._item)
+        new_item['labels'] = list(labels)
+        return Post(new_item)
 
 
-__all__ = ['CaptchaChallenge', 'BadAuthentication', 'Remote']
+__all__ = ['Remote']
