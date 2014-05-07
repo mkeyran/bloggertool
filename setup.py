@@ -5,7 +5,7 @@ import os
 from setuptools import setup, find_packages
 
 requires = ['python-dateutil', 'trafaret', 'keyring', 'jinja2', 'gdata',
-            'markdown', 'PyYAML', 'pyinotify']
+            'markdown', 'PyYAML', 'pyinotify', 'google-api-python-client']
 
 
 def get_version(fname):

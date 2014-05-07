@@ -24,13 +24,12 @@ class InfoCommand(BaseCommand):
         $ blog help template
     """)
 
-    FLAGS = ('email', 'blogid',
+    FLAGS = ('blogid',
              'template', 'drop_template',
              'source_encoding')
 
     @classmethod
     def fill_parser(cls, parser):
-        parser.add_argument('--email', help="set user email")
         parser.add_argument('--blogid', help="set blog id")
         # templates
         exclusive = parser.add_mutually_exclusive_group()
@@ -54,7 +53,6 @@ class InfoCommand(BaseCommand):
                                 set default encoding for source files"""))
 
     def __init__(self, args):
-        self.email = args.email
         self.blogid = args.blogid
         self.template = args.template
         self.drop_template = args.drop_template
@@ -70,7 +68,6 @@ class InfoCommand(BaseCommand):
         if not self.has_updates:
             out = T("""
                 User info:
-                    email: {info.email}
                     blogid: {info.blogid!N}
                     template:
                         dir: {info.template_dir!N}
@@ -79,8 +76,6 @@ class InfoCommand(BaseCommand):
                 """)(info=info)
             self.log.info(out)
         else:
-            if self.email is not None:
-                info.email = self.email
             if self.blogid is not None:
                 info.blogid = self.blogid
             if self.drop_template:

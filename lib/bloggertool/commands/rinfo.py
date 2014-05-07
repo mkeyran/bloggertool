@@ -23,16 +23,12 @@ class RInfoCommand(BaseCommand):
         pass
 
     def __init__(self, args):
-        #self.email = args.email
         pass
 
     def run(self):
         config = self.config
 
         info = config.info
-
-        if not info.email:
-            raise ConfigError("Set user email first")
 
         srv = info.remote()
 

@@ -31,10 +31,6 @@ class RLsCommand(BaseCommand):
 
         info = config.info
 
-        if not info.email:
-            self.log.error('Set user email first')
-            return 1
-
         srv = info.remote()
 
         rposts = srv.get_posts()

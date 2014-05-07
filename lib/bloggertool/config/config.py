@@ -20,6 +20,7 @@ from bloggertool.ui import ask as _do_ask
 
 class Config(object):
     CONFIG_FILENAME = '.blogspot.yaml'
+    SECRET_FILENAME = '.client_secret.json'
     log = class_logger()
     _ask = staticmethod(_do_ask)
 
@@ -38,6 +39,10 @@ class Config(object):
     @property
     def config_filename(self):
         return os.path.join(self.root, self.CONFIG_FILENAME)
+
+    @property
+    def secret_filename(self):
+        return os.path.join(self.root, self.SECRET_FILENAME)
 
     @property
     def root(self):

@@ -4,39 +4,69 @@
 #
 # This module is part of BloggerTool and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
+from __future__ import print_function
 
+import getpass
 from copy import deepcopy
 
 from dateutil.parser import parse as dtparse
 from dateutil.tz import tzutc
 
-from gdata.blogger.client import BloggerClient as _BloggerClient
-from gdata.client import CaptchaChallenge, BadAuthentication
-from gdata.blogger.data import BlogPost as _BlogPost
+#from gdata.blogger.client import BloggerClient as _BloggerClient
+#from gdata.client import CaptchaChallenge, BadAuthentication
+#from gdata.blogger.data import BlogPost as _BlogPost
 
-#from atom.data import Content
+from googleapiclient import discovery
+from oauth2client import client
+from oauth2client import keyring_storage
+from oauth2client import tools
+import httplib2
+from googleapiclient import discovery
 
 from bloggertool.__version__ import __version__
 from bloggertool.exceptions import RemoteError
 
 
 class Remote(object):
+    URL = 'https://www.googleapis.com/blogger/v3/'
     POST_URL = 'http://www.blogger.com/feeds/%s/posts/default/%s'
     SOURCE = 'AndrewSvetlov-BloggerTool-%s' % __version__
 
-    def __init__(self, email, passwd, blogid,
-              captcha_token=None, captcha_response=None):
+    def __init__(self, blogid, secret_filename):
         self._blogid = blogid
-        self._client = _BloggerClient()
-        self._client.client_login(email,
-                                  passwd,
-                                  source=self.SOURCE,
-                                  service='blogger',
-                                  captcha_token=captcha_token,
-                                  captcha_response=captcha_response)
+        flow = client.flow_from_clientsecrets(
+            secret_filename,
+            scope="https://www.googleapis.com/auth/blogger",
+            message=tools.message_if_missing(secret_filename))
+
+        user = getpass.getuser()
+        storage = keyring_storage.Storage('blogspot-tool-storage', user)
+        credentials = storage.get()
+        http = httplib2.Http()
+        if credentials is None or credentials.invalid:
+            flow.redirect_uri = client.OOB_CALLBACK_URN
+            authorize_url = flow.step1_get_authorize_url()
+            print('Go to', authorize_url)
+            code = raw_input('Enter verification code: ').strip()
+
+            try:
+                credentials = flow.step2_exchange(code, http=http)
+            except client.FlowExchangeError as e:
+                raise RemoteError('Authentication has failed: %s' % e)
+
+            storage.put(credentials)
+            credentials.set_store(storage)
+
+
+        http = credentials.authorize(http=http)
+
+        # Construct a service object via the discovery service.
+        service = discovery.build('blogger', 'v3', http=http)
+        self._client = service
 
     def get_blogs(self):
-        return Blogs(self._client.get_blogs())
+        feed = self._client.blogs().listByUser(userId="self").execute()
+        return Blogs(feed)
 
     def check_blogid(self):
         if not self._blogid:

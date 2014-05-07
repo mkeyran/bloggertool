@@ -5,14 +5,10 @@
 # This module is part of BloggerTool and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-import getpass
-
-import keyring
 import jinja2
 
-from bloggertool.remote import Remote, CaptchaChallenge, BadAuthentication
-from bloggertool.exceptions import ConfigError
-from bloggertool.ui import get_captcha
+from bloggertool.remote import Remote
+from bloggertool.exceptions import ConfigError, RemoteError
 
 from .attrs import Record, str_attr
 from .file_system import FileSystem
@@ -22,7 +18,6 @@ class Info(Record):
     """Project info"""
     _template_env = None
 
-    email = str_attr()
     blogid = str_attr()
     template_dir = str_attr()
     template_file = str_attr()
@@ -72,50 +67,12 @@ class Info(Record):
             self._template_env.filters['abspath'] = self.abspath_filter
         return self._template_env.get_template(self.template_file)
 
-    def get_passwd(self, force=False):
-        if self.email is None:
-            raise ConfigError("User email has not specified")
-        user = getpass.getuser()
-        if force:
-            passwd = None
-        else:
-            passwd = keyring.get_password('blogspot-tool', user)
-        if passwd is None:
-            if self.config.interactive is not None:
-                raise ConfigError("Cannot ask user in non-interactive mode")
-            passwd = getpass.getpass(
-                "Enter password for google account %s: " %
-                self.email)
-            keyring.set_password('blogspot-tool', user, passwd)
-        return passwd
-
     def remote(self):
-        if self.email is None:
-            raise ConfigError("User email has not specified")
-
-        has_error = False
-        captcha_token = None
-        captcha_response = None
-        for i in range(3):
-            try:
-                passwd = self.get_passwd(has_error)
-                srv = Remote(self.email,
-                             passwd,
-                             self.blogid,
-                             captcha_token=captcha_token,
-                             captcha_response=captcha_response)
-                return srv
-            except BadAuthentication, ex:
-                self.log.warning('Cannot login: %s', ex)
-                has_error = True
-            except CaptchaChallenge, ex:
-                self.log.warning("Captcha required %s", ex)
-                self.log.debug("Captcha_url %s", ex.captcha_url)
-                captcha_token = ex.captcha_token
-
-                captcha_response = get_captcha(ex.captcha_url)
-                if captcha_response is None:
-                    raise ConfigError('Cannot process CAPTCHA')
-                has_error = True
+        try:
+            srv = Remote(self.blogid,
+                         secret_filename=self.config.secret_filename)
+            return srv
+        except RemoteError as ex:
+            self.log.warning('Cannot login: %s', ex)
 
         raise ConfigError('Cannot authenticate')
