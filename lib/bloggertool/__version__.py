@@ -5,4 +5,4 @@
 # This module is part of BloggerTool and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-__version__ = '0.4'
+__version__ = '0.4.1'
