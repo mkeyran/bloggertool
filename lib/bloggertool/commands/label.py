@@ -1,5 +1,5 @@
 # commands/label.py
-# Copyright (C) 2011-2012 Andrew Svetlov
+# Copyright (C) 2011-2014 Andrew Svetlov
 # andrew.svetlov@gmail.com
 #
 # This module is part of BloggerTool and is released under
