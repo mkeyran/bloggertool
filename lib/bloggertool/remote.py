@@ -106,7 +106,7 @@ class Remote(object):
             body={
                 "title": slug,
                 "content": content,
-                "labels": labels if labels else []}
+                "labels": list(labels) if labels else []}
             )
         rep = req.execute()
         if slug != title:
