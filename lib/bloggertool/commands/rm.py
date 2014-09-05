@@ -9,7 +9,6 @@ from textwrap import dedent
 
 from bloggertool.exceptions import FileNotFoundError
 from bloggertool.str_util import qname
-from bloggertool.ui import ask
 from .basecommand import BaseCommand
 
 
@@ -55,6 +54,7 @@ class RmCommand(BaseCommand):
             do_delete = False
 
         if need_ask and config.interactive is None:
+            # TODO: implement or drop `ask`
             ret = ask("Post %s is registered but post file does not exist\n"
                       "Do you want to remove it?" % qname(post.name),
                       'y/N')

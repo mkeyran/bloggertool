@@ -15,14 +15,12 @@ import yaml
 from bloggertool.exceptions import RootNotFoundError
 from .file_system import FileSystem
 from bloggertool.log_util import class_logger
-from bloggertool.ui import ask as _do_ask
 
 
 class Config(object):
     CONFIG_FILENAME = '.blogspot.yaml'
     SECRET_FILENAME = '.client_secret.json'
     log = class_logger()
-    _ask = staticmethod(_do_ask)
 
     def __init__(self, root):
         self._fs = FileSystem(root)
@@ -158,6 +156,3 @@ class Config(object):
     @property
     def info(self):
         return self._info
-
-    def ask(self, prompt, answers):
-        return self._ask(prompt, answers)
