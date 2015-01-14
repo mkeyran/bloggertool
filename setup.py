@@ -5,7 +5,7 @@ import os
 from setuptools import setup, find_packages
 
 requires = ['python-dateutil', 'keyring', 'jinja2',
-            'markdown', 'PyYAML', 'pyinotify', 'googleapiclient',
+            'markdown', 'PyYAML', 'pyinotify', 'google-api-python-client',
             'transliterate']
 
 
